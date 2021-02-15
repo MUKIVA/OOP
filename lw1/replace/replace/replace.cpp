@@ -58,24 +58,13 @@ int main(int argc, char* argv[])
     std::string fileContent;
     while (getline(input, fileContent))
     {
-        //replace
-        int num = fileContent.find(args->searchString);
-        std::string result = "";
-        while (num != -1)
+        // replace
+        while (fileContent.find(args->searchString) != -1)
         {
-            result.append(fileContent.substr(0, num + args->searchString.length()));
-            if (num != -1)
-            {
-                fileContent = fileContent.substr(num + args->searchString.length(), -1);
-            }
-            result.replace(result.rfind(args->searchString), args->searchString.length(), args->replaceString);
-            num = fileContent.find(args->searchString);
+            output << fileContent.substr(0, fileContent.find(args->searchString)) + args->replaceString;
+            fileContent = fileContent.substr(fileContent.find(args->searchString) + args->searchString.length(), -1);
         }
-        result.append(fileContent);
-        //Copy replaced string to output file
-        for (int i = 0; i < result.length(); i++)
-            output.put(result[i]);
-        output.put('\n');
+        output << fileContent + "\n";
     }
     
     if (!output.flush())

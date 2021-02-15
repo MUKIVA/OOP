@@ -95,7 +95,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>"$(ProjectDir)Test.bat" "C:\OOP\lw1\replace\x64\Debug\replace.exe"</Command>
+      <Command>"$(ProjectDir)Test.bat" "C:\Github\OOP\lw1\replace\x64\Debug\replace.exe"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -115,7 +115,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>"$(ProjectDir)Test.bat" "C:\OOP\lw1\replace\x64\Debug\replace.exe"</Command>
+      <Command>"$(ProjectDir)Test.bat" "C:\Github\OOP\lw1\replace\x64\Debug\replace.exe"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -131,7 +131,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>"$(ProjectDir)Test.bat" "C:\OOP\lw1\replace\x64\Debug\replace.exe"</Command>
+      <Command>"$(ProjectDir)Test.bat" "C:\Github\OOP\lw1\replace\x64\Debug\replace.exe"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,7 +151,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>"$(ProjectDir)Test.bat" "C:\OOP\lw1\replace\x64\Debug\replace.exe"</Command>
+      <Command>"$(ProjectDir)Test.bat" "C:\Github\OOP\lw1\replace\x64\Debug\replace.exe"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,6 +167,7 @@
     <Text Include="InTest6.txt" />
     <Text Include="InTest7.txt" />
     <Text Include="InTest8.txt" />
+    <Text Include="output.txt" />
     <Text Include="OutTest1.txt" />
     <Text Include="OutTest2.txt" />
     <Text Include="OutTest3.txt" />

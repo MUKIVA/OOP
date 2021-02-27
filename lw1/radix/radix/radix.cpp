@@ -1,122 +1,128 @@
 ﻿#include <iostream>
-#include <string>
 #include <optional>
+#include <string>
 
-const int minRadix = 2;
-const int maxRadix = 36;
 
+const int MIN_RADIX = 2;
+const int MAX_RADIX = 36;
 
 struct Args
 {
-    std::string sourceNotation;
-    std::string destinationNotation;
-    std::string value;
+	std::string sourceNotation;
+	std::string destinationNotation;
+	std::string value;
 };
 
 std::optional<Args> ParseArgs(int argc, char* argv[])
 {
-    if (argc != 4)
-    {
-        std::cout << "Ivalid arguments count\n";
-        std::cout << "Please use: radix.exe <source notation> <destination notation> <value>\n";
-        return std::nullopt;
-    }
-    Args args;
-    args.sourceNotation = argv[1];
-    args.destinationNotation = argv[2];
-    args.value = argv[3];
-    return args;
+	if (argc != 4)
+	{
+		std::cout << "Ivalid arguments count\n";
+		std::cout << "Please use: radix.exe <source notation> <destination notation> <value>\n";
+		return std::nullopt;
+	}
+	Args args;
+	args.sourceNotation = argv[1];
+	args.destinationNotation = argv[2];
+	args.value = argv[3];
+	return args;
 }
-// Функция перевода из строки в число
+
 int StringToInt(const std::string& str, int radix, bool& wasError)
 {
-    try
-    {
-        std::stoi(str, 0, radix);
-    }
-    catch (const std::exception& ex)
-    {
-        std::string what = ex.what();
-        if (what == "stoi argument out of range")
-        {
-            std::cout << "Value out of range\n";
-        }
-        if (what == "invalid stoi argument")
-        {
-            std::cout << "Incorrect arguments\n";
-        }
-        wasError = true;
-        return 1;
-    }
-    return std::stoi(str, 0, radix);
+	const std::string VALID_CAHRS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+	std::size_t unaryOperatorPos = str.find_last_of("+-");
+
+	if (str.find_first_not_of(VALID_CAHRS.substr(0, radix) + "+-") != std::string::npos
+		|| ((unaryOperatorPos != std::string::npos)
+			&& (unaryOperatorPos != 0)))
+	{
+		std::cout << "An invalid character was found\n";
+		wasError = true;
+		return 1;
+	}
+	int result;
+	try
+	{
+		result = std::stoi(str, 0, radix);
+	}
+	catch (const std::exception& ex)
+	{
+		std::string what = ex.what();
+		if (what == "stoi argument out of range")
+		{
+			std::cout << "Value out of range\n";
+		}
+		if (what == "invalid stoi argument")
+		{
+			std::cout << "Incorrect arguments\n";
+		}
+		wasError = true;
+		return 1;
+	}
+	return result;
 }
 
-// Функция перевода из числа в строку
 std::string IntToString(int n, int radix, bool& wasError)
 {
-    const std::string digists = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const int digitsLength = digists.length() - 1;
-    std::string result = "";
+	const std::string DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    if (n < 0)
-    {
-        n *= -1;
-        result = "-";
-    }
-    // В случае если чило 0
-    if (n == 0)
-    {
-        result = '0';
-    }
-    // Перевод чилсла
-    while (n)
-    {
-        int curDigit = n % radix;
-        if (curDigit < 0 || curDigit > n % radix)
-        {
-            std::cout << "Error while converting a number to a string";
-            wasError = true;
-            return "";
-        }
-        result = digists[curDigit] + result;
-        n = n / radix;
-    }
-    if (result[result.length() - 1] == '-')
-    {
-        result = "-" + result.substr(0, result.find("-"));
-    }
-    return result;
+	std::string result = "";
+
+	if (n < 0)
+		result = "-";
+
+	if (n == 0)
+		result = '0';
+
+	int insertPos = result.length();
+
+	while (n)
+	{
+		int curDigit = abs(n) % radix;
+		if (curDigit < 0)
+		{
+			std::cout << "Error while converting a number to a string";
+			wasError = true;
+			return "";
+		}
+		result.insert(insertPos, 1, DIGITS[curDigit]);
+		n /= radix;
+	}
+
+	return result;
 }
 
 int main(int argc, char* argv[])
 {
-    bool err = false;
-    auto args = ParseArgs(argc, argv);
-    
-    // Проверка диапазона оснований
-    int radix[2];
-    radix[0] = StringToInt(args->sourceNotation, 10, err);
-    if (err) return 1;
-    radix[1] = StringToInt(args->destinationNotation, 10, err);
-    if (err) return 1;
-    for (int num : radix)
-    {   
-        if (num > maxRadix && num < minRadix)
-        {
-            std::cout << "One of the notations out of range" << std::endl;
-            std::cout << "Please specify notation in the range from 2 to 36" << std::endl;
-            err = true;
-        }
-    }
+	bool err = false;
+	auto args = ParseArgs(argc, argv);
 
-    // Перевод значения из числа в строку с конечным основанием
-    
-    int value = StringToInt(args->value, radix[0], err);
-    if (err) return 1;
-    std::string outStr = IntToString(value, radix[1], err);
-    if (err) return 1;
+	int radix[2];
+	radix[0] = StringToInt(args->sourceNotation, 10, err);
+	if (err)
+		return 1;
+	radix[1] = StringToInt(args->destinationNotation, 10, err);
+	if (err)
+		return 1;
+	for (int num : radix)
+	{
+		if (num > MAX_RADIX || num < MIN_RADIX)
+		{
+			std::cout << "One of the notations out of range" << std::endl
+					  << "Please specify notation in the range from 2 to 36" << std::endl;
+			return 1;
+		}
+	}
 
-    std::cout << outStr << std::endl;
-    // Программа оказалась успешной
-    return 0;
+	int value = StringToInt(args->value, radix[0], err);
+	if (err)
+		return 1;
+	std::string outStr = IntToString(value, radix[1], err);
+	if (err)
+		return 1;
+
+	std::cout << outStr << std::endl;
+	return 0;
 }

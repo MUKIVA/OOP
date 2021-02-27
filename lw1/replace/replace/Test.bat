@@ -22,7 +22,7 @@ REM Test 4 : Проверка замены "1231234" на "u"
 fc "%TEMP%\output.txt" OutTest4.txt > nul || goto err
 echo Test 4 : successful
 REM Test 5 : Проверка на пустые аргументы
-%MyProgram% InTest5.txt "%TEMP%\TheFileShouldNotExist.txt" "" "" > nul && goto err
+%MyProgram% InTest5.txt "%TEMP%\TheFileShouldNotExist.txt" "" "" > nul || goto err
 echo Test 5 : successful
 REM test 6 : Замена на самого себя
 %MyProgram% InTest6.txt "%TEMP%\output.txt" "pog" "pog" > nul || goto err

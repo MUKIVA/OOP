@@ -42,6 +42,12 @@ REM Test 11 : проверка крайнего значения
 echo 7FFFFFFF> "output.txt"
 fc "%TEMP%\out.txt" "output.txt" > nul || goto err
 echo Test 11 passed
+REM Test 12 : Указано основание выходящее за пределы возможностей программы
+%MyProgram% "37" "16" "15" > "%TEMP%\out.txt" && goto err
+echo Test 12 passed
+REM Test 13 : Встречен недопустимый символ посреди числа
+%MyProgram% "10" "16" "1@5" > "%TEMP%\out.txt" && goto err
+echo Test 13 passed
 REM Тесты прошли успешно
 exit /B 0
 

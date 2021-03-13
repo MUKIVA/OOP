@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{26a756d8-c672-4961-8a8c-50ddf51de9c2}</ProjectGuid>
-    <RootNamespace>invert</RootNamespace>
+    <ProjectGuid>{fede66e4-a1e0-49cb-b77c-e342d1892bf3}</ProjectGuid>
+    <RootNamespace>fill</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -143,13 +143,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="invert.cpp" />
+    <ClCompile Include="fill.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="m.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Tests.bat" />
+    <Text Include="in.txt" />
+    <Text Include="out.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

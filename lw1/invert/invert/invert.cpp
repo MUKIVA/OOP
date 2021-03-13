@@ -3,9 +3,12 @@
 #include <optional>
 #include <iomanip>
 #include <fstream>
+#include <array>
 
-const int SIZE = 3;
-
+const int SIZE_3 = 3;
+const int SIZE_2 = 2;
+using Matrix3x3 = std::array<std::array<float, SIZE_3>, SIZE_3>;
+using Matrix2x2 = std::array<std::array<float, SIZE_2>, SIZE_2>;
 struct Args
 {
 	std::string matrixFileName;
@@ -29,11 +32,11 @@ struct Error
 	std::string message;
 };
 
-bool MatrixTranspose(float (&matrix)[SIZE][SIZE])
+bool MatrixTranspose(Matrix3x3& matrix)
 {
-	for (int i = 0; i < SIZE; i++)
+	for (int i = 0; i < SIZE_3; i++)
 	{
-		for (int j = i; j < SIZE; j++)
+		for (int j = i; j < SIZE_3; j++)
 		{
 			std::swap(matrix[i][j], matrix[j][i]);
 		}
@@ -41,14 +44,13 @@ bool MatrixTranspose(float (&matrix)[SIZE][SIZE])
 	return 1;
 }
 
-bool PrintMatrix(float (&matrix)[SIZE][SIZE])
+bool PrintMatrix(Matrix3x3 matrix)
 {
-	std::setprecision(3);
-	for (int i = 0; i < SIZE; i++)
+	for (int i = 0; i < SIZE_3; i++)
 	{
-		for (int j = 0; j < SIZE; j++)
+		for (int j = 0; j < SIZE_3; j++)
 		{
-			std::cout << std::setw(10) << std::left << matrix[i][j];
+			std::cout << std::setprecision(3) << matrix[i][j] << "\t";
 		}
 		std::cout << std::endl;
 	}
@@ -56,7 +58,7 @@ bool PrintMatrix(float (&matrix)[SIZE][SIZE])
 	return 1;
 }
 
-float MatrixDeterminant3x3(float (&matrix)[SIZE][SIZE])
+float MatrixDeterminant3x3(Matrix3x3 matrix)
 {
 	return matrix[0][0] * matrix[1][1] * matrix[2][2]
 		+ matrix[0][1] * matrix[1][2] * matrix[2][0]
@@ -66,17 +68,17 @@ float MatrixDeterminant3x3(float (&matrix)[SIZE][SIZE])
 		- matrix[0][1] * matrix[1][0] * matrix[2][2];
 }
 
-bool GetMinor(float (&matrix)[SIZE][SIZE], float (&result)[SIZE - 1][SIZE - 1], int i, int j)
+bool GetMinor(Matrix3x3& matrix, Matrix2x2& result, int i, int j)
 {
 	int m = 0, n = 0;
-	for (int k = 0; k < SIZE; k++)
+	for (int k = 0; k < SIZE_3; k++)
 		if (k != i)
-			for (int l = 0; l < SIZE; l++)
+			for (int l = 0; l < SIZE_3; l++)
 			{
 				if (l != j)
 				{
 					result[m][n] = matrix[k][l];
-					if (n < SIZE - 2)
+					if (n < SIZE_3 - 2)
 						n++;
 					else
 					{
@@ -88,18 +90,18 @@ bool GetMinor(float (&matrix)[SIZE][SIZE], float (&result)[SIZE - 1][SIZE - 1], 
 	return 1;
 }
 
-float MatrixDeterminant2x2(float (&matrix)[SIZE - 1][SIZE - 1])
+float MatrixDeterminant2x2(Matrix2x2& matrix)
 {
 	return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
 }
 
-bool CoefficientMatrix(float (&matrix)[SIZE][SIZE], float (&result)[SIZE][SIZE])
+bool CoefficientMatrix(Matrix3x3& matrix, Matrix3x3& result)
 {
 	int sign = 1;
-	for (int i = 0; i < SIZE; i++)
-		for (int j = 0; j < SIZE; j++)
+	for (int i = 0; i < SIZE_3; i++)
+		for (int j = 0; j < SIZE_3; j++)
 		{
-			float minor[SIZE - 1][SIZE - 1]{ 0 };
+			Matrix2x2 minor{ 0 };
 			GetMinor(matrix, minor, i, j);
 			result[i][j] = MatrixDeterminant2x2(minor) * sign;
 			sign *= -1;
@@ -107,7 +109,7 @@ bool CoefficientMatrix(float (&matrix)[SIZE][SIZE], float (&result)[SIZE][SIZE])
 	return 1;
 }
 
-bool GetMatrix3x3(std::string& fileName, float (&matrix)[SIZE][SIZE], Error& wasError)
+bool GetMatrix3x3(std::string& fileName, Matrix3x3& matrix, Error& wasError)
 {
 	// подключение файла
 	std::ifstream input(fileName);
@@ -117,9 +119,9 @@ bool GetMatrix3x3(std::string& fileName, float (&matrix)[SIZE][SIZE], Error& was
 		return 0;
 	}
 	// чтение данных из файла
-	for (int i = 0; i < SIZE; i++)
+	for (int i = 0; i < SIZE_3; i++)
 	{
-		for (int j = 0; j < SIZE; j++)
+		for (int j = 0; j < SIZE_3; j++)
 		{
 			if (!(input >> matrix[i][j]))
 			{
@@ -137,30 +139,41 @@ bool GetMatrix3x3(std::string& fileName, float (&matrix)[SIZE][SIZE], Error& was
 	return 1;
 }
 
+bool InvertMatrix(Matrix3x3& matrix, Error wasError)
+{
+	float det = 0;
+	if (!(det = MatrixDeterminant3x3(matrix)))
+	{
+		wasError.message = "The determinant is 0. The inverse matrix does not exist";
+		return 0;
+	}
+	MatrixTranspose(matrix);
+	Matrix3x3 coefMatrix{ 0 };
+	CoefficientMatrix(matrix, coefMatrix);
+	for (int i = 0; i < SIZE_3; i++)
+		for (int j = 0; j < SIZE_3; j++)
+			coefMatrix[i][j] /= det;
+	matrix = coefMatrix;
+	return 1;
+}
+
 int main(int argc, char* argv[])
 {
 	auto args = ParseArgs(argc, argv);
 	Error err;
 	err.message = "";
-	float matrix[SIZE][SIZE]{ 0 };
+	Matrix3x3 matrix { 0 }; 
 	if (!GetMatrix3x3(args->matrixFileName, matrix, err))
 	{
 		std::cout << err.message;
 		return 1;
 	}
-	float det = 0;
-	if (!(det = MatrixDeterminant3x3(matrix)))
+	
+	if (!InvertMatrix(matrix, err))
 	{
-		std::cout << "The determinant is 0. The inverse matrix does not exist";
+		std::cout << err.message;
 		return 1;
 	}
-
-	MatrixTranspose(matrix);
-	float coefMatrix[SIZE][SIZE];
-	CoefficientMatrix(matrix, coefMatrix);
-	for (int i = 0; i < SIZE; i++)
-		for (int j = 0; j < SIZE; j++)
-			coefMatrix[i][j] /= det;
-	PrintMatrix(coefMatrix);
+	PrintMatrix(matrix);
 	return 0;
 }

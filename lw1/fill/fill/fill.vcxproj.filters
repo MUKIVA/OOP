@@ -15,18 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="invert.cpp">
+    <Text Include="in.txt">
       <Filter>Исходные файлы</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="m.txt">
+    </Text>
+    <Text Include="out.txt">
       <Filter>Исходные файлы</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests.bat">
+    <ClCompile Include="fill.cpp">
       <Filter>Исходные файлы</Filter>
-    </None>
+    </ClCompile>
   </ItemGroup>
 </Project>

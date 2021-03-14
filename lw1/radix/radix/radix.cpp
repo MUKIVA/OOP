@@ -12,28 +12,6 @@ struct Args
 	std::string value;
 };
 
-std::optional<Args> ParseArgs(int argc, char* argv[])
-{
-	if (argc != 4)
-	{
-		std::cout << "Ivalid arguments count\n";
-		std::cout << "Please use: radix.exe <source notation> <destination notation> <value>\n";
-		return std::nullopt;
-	}
-	Args args;
-	try
-	{
-		args.sourceNotation = std::stoi(argv[1]);
-		args.destinationNotation = std::stoi(argv[2]);
-	}
-	catch (const std::exception& /*ex*/)
-	{
-		return std::nullopt;
-	}
-	args.value = argv[3];
-	return args;
-}
-
 int StringToInt(const std::string& str, int radix, bool& wasError)
 {
 	wasError = false;
@@ -127,6 +105,30 @@ std::string IntToString(int n, int radix, bool& wasError)
 		n /= radix;
 	}
 	return result;
+}
+
+std::optional<Args> ParseArgs(int argc, char* argv[])
+{
+	if (argc != 4)
+	{
+		std::cout << "Ivalid arguments count\n";
+		std::cout << "Please use: radix.exe <source notation> <destination notation> <value>\n";
+		return std::nullopt;
+	}
+	Args args;
+	bool err;
+	args.sourceNotation = StringToInt(argv[1], 10, err);
+	if (err)
+	{
+		return std::nullopt;
+	}
+	args.destinationNotation = StringToInt(argv[2], 10, err);
+	if (err)
+	{
+		return std::nullopt;
+	}
+	args.value = argv[3];
+	return args;
 }
 
 std::string RadToRad(int from, int to, std::string& value)

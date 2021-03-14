@@ -1,13 +1,12 @@
+#include <fstream>
 #include <iostream>
 #include <optional>
-#include <fstream>
 #include <string>
-#include <array>
 
-const int COORD_MAX = 100;
+const int COORD_MAX = 65;
 const int COORD_MIN = 0;
-using PaintField = std::array<std::array<char, COORD_MAX>, COORD_MAX>;
-PaintField field;
+//using PaintField = std::array<std::array<char, COORD_MAX>, COORD_MAX>;
+char field[COORD_MAX][COORD_MAX];
 
 struct Args
 {
@@ -29,19 +28,19 @@ std::optional<Args> ParseArgs(int argc, char* argv[])
 	return args;
 }
 
-bool ClearField(PaintField& field)
+bool ClearField()
 {
-	for (std::array<char, COORD_MAX>& row : field)
+	for (short i = 0; i < COORD_MAX; i++)
 	{
-		for (char& ch : row)
+		for (short j = 0; j < COORD_MAX; j++)
 		{
-			ch = ' ';
+			field[i][j] = ' ';
 		}
 	}
 	return 1;
 }
 
-bool CopyFieldFromIS(PaintField& field, std::istream& is)
+bool CopyFieldFromIS(std::istream& is)
 {
 	std::string lineContent;
 	int row = 0;
@@ -62,50 +61,48 @@ bool CopyFieldFromIS(PaintField& field, std::istream& is)
 	return 1;
 }
 
-bool fill(int row, int column, const int rowOffset, const int columnOffset)
+struct Point
 {
-	if ((row + rowOffset >= COORD_MAX || row + rowOffset < COORD_MIN)
-		|| (column + columnOffset >= COORD_MAX || column + columnOffset < COORD_MIN)
-		|| (columnOffset > COORD_MAX || rowOffset > COORD_MAX))
+	short x = -1;
+	short y = -1;
+};
+
+bool OnField(Point& p)
+{
+	return (p.x >= COORD_MIN && p.x < COORD_MAX
+		&& p.y >= COORD_MIN && p.y < COORD_MAX);
+}
+
+bool fill(Point p)
+{
+	if (!(p.x >= COORD_MIN && p.x < COORD_MAX
+		&& p.y >= COORD_MIN && p.y < COORD_MAX))
 	{
-		//std::cout << "close";
 		return 0;
 	}
-	if ((field[row + rowOffset][column + columnOffset] != ' '))
+	if (field[p.y][p.x] == '#' || field[p.y][p.x] == '-')
 	{
-		//std::cout << "close";
 		return 0;
 	}
-	field[row + rowOffset][column + columnOffset] = '-';
-	fill(row, column, rowOffset + 1, columnOffset);
-	fill(row, column, rowOffset - 1, columnOffset);
-	fill(row, column, rowOffset, columnOffset + 1);
-	fill(row, column, rowOffset, columnOffset - 1);
+	if (field[p.y][p.x] == ' ')
+	{
+		field[p.y][p.x] = '-';
+	}
+	fill({ p.x + 1, p.y });
+	fill({ p.x, p.y + 1 });
+	fill({ p.x - 1, p.y });
+	fill({ p.x, p.y - 1 });
 
 	return 1;
 }
 
-bool fill(int row, int column)
+bool WriteField(std::ostream& os)
 {
-	if (field[row][column] != 'O')
+	for (short i = 0; i < COORD_MAX; i++)
 	{
-		return 0;
-	}
-	int rowOffset = 0, columnOffset = 0;
-	fill( row, column, rowOffset + 1, columnOffset);
-	fill( row, column, rowOffset - 1, columnOffset);
-	fill( row, column, rowOffset, columnOffset + 1);
-	fill( row, column, rowOffset, columnOffset - 1);
-	return 1;
-}
-
-bool WriteField(PaintField& field, std::ostream& os)
-{
-	for (std::array<char, COORD_MAX>& row : field)
-	{
-		for (char ch : row)
+		for (short j = 0; j < COORD_MAX; j++)
 		{
-			if (!os.put(ch))
+			if (!os.put(field[i][j]))
 			{
 				std::cout << "Failed to write data to output stream";
 				return 0;
@@ -116,17 +113,6 @@ bool WriteField(PaintField& field, std::ostream& os)
 	return 1;
 }
 
-bool Test(PaintField f, int i)
-{
-	std::cout << "Вошел\n";
-	if (i != 99)
-	{
-		Test(f, i + 1);
-	}
-	std::cout << "clear\n";
-	return 1;
-}
-
 int main(int argc, char* argv[])
 {
 	auto args = ParseArgs(argc, argv);
@@ -134,7 +120,7 @@ int main(int argc, char* argv[])
 	{
 		return 1;
 	}
-	
+
 	std::ifstream input(args->inputFileName);
 	if (!input.is_open())
 	{
@@ -148,25 +134,24 @@ int main(int argc, char* argv[])
 		std::cout << "Failed to open file for writing\n";
 		return 1;
 	}
-	
+
 	// заполнение поля пробелами
-	ClearField(field);
+	ClearField();
 
 	// Копирование данных из файла
-	CopyFieldFromIS(field, input);
+	CopyFieldFromIS(input);
 
 	// Заполнение поля
-	//Test(field, 0);
-	for (int i = 0; i < COORD_MAX; i++)
+	for (short i = 0; i < COORD_MAX; i++)
 	{
-		for (int j = 0; j < COORD_MAX; j++)
+		for (short j = 0; j < COORD_MAX; j++)
 		{
 			if (field[i][j] == 'O')
 			{
-				fill(i, j);
+				fill({ j, i });
 			}
 		}
 	}
-	WriteField(field, output);
+	WriteField(output);
 	return 0;
 }

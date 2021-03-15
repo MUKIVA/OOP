@@ -4,6 +4,7 @@
 
 const int MIN_RADIX = 2;
 const int MAX_RADIX = 36;
+const std::string DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 struct Args
 {
@@ -29,13 +30,12 @@ int StringToInt(const std::string& str, int radix, bool& wasError)
 		std::cout << "Incorrect arguments\n";
 		return 1;
 	}
-	const std::string VALID_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	const std::string SIGNS_CHARS = "+-";
 	const size_t NPOS = std::string::npos;
 
 	std::size_t unaryOperatorPos = str.find_last_of(SIGNS_CHARS);
 
-	if (str.find_first_not_of(VALID_CHARS.substr(0, radix) + "+-") != NPOS
+	if (str.find_first_not_of(DIGITS.substr(0, radix) + "+-") != NPOS
 		|| ((unaryOperatorPos != NPOS)
 			&& (unaryOperatorPos != 0)))
 	{
@@ -56,7 +56,7 @@ int StringToInt(const std::string& str, int radix, bool& wasError)
 		if (SIGNS_CHARS.find(digit) != NPOS)
 			continue;
 		result *= radix;
-		result += VALID_CHARS.find(digit);
+		result += DIGITS.find(digit);
 		if ((sign == -1 && result > abs((long long int)INT_MIN))
 			|| sign == 1 && result > INT_MAX)
 		{
@@ -80,8 +80,6 @@ std::string IntToString(int n, int radix, bool& wasError)
 		return "";
 	}
 
-	const std::string DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
 	std::string result = "";
 
 	if (n < 0)
@@ -94,13 +92,7 @@ std::string IntToString(int n, int radix, bool& wasError)
 
 	while (n)
 	{
-		int curDigit = abs(n) % radix;
-		if (curDigit < 0)
-		{
-			std::cout << "Error while converting a number to a string";
-			wasError = true;
-			return "";
-		}
+		int curDigit = abs(n) % radix;	
 		result.insert(insertPos, 1, DIGITS[curDigit]);
 		n /= radix;
 	}
@@ -131,7 +123,7 @@ std::optional<Args> ParseArgs(int argc, char* argv[])
 	return args;
 }
 
-std::string RadToRad(int from, int to, std::string& value)
+std::string ConvertRadix(const int from, const int to, const std::string& value)
 {
 	bool err;
 	int number = StringToInt(value, from, err);
@@ -151,7 +143,7 @@ int main(int argc, char* argv[])
 		std::cout << "Invalid arguments\n";
 		return 1;
 	}
-	std::string outStr = RadToRad(args->sourceNotation, args->destinationNotation, args->value);
+	std::string outStr = ConvertRadix(args->sourceNotation, args->destinationNotation, args->value);
 	if (outStr == "")
 	{
 		return 1;

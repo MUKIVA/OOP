@@ -1,18 +1,28 @@
+#include <array>
 #include <fstream>
 #include <iostream>
 #include <optional>
+#include <stack>
 #include <string>
-
-const int COORD_MAX = 65;
-const int COORD_MIN = 0;
-//using PaintField = std::array<std::array<char, COORD_MAX>, COORD_MAX>;
-char field[COORD_MAX][COORD_MAX];
 
 struct Args
 {
 	std::string inputFileName;
 	std::string outputFileName;
 };
+
+struct Point
+{
+	short x = -1;
+	short y = -1;
+};
+
+const int COORD_MAX = 100;
+const int COORD_MIN = 0;
+using PaintField = std::array<std::array<char, COORD_MAX>, COORD_MAX>;
+using Stack = std::stack<Point>;
+PaintField field;
+Stack stack;
 
 std::optional<Args> ParseArgs(int argc, char* argv[])
 {
@@ -28,7 +38,7 @@ std::optional<Args> ParseArgs(int argc, char* argv[])
 	return args;
 }
 
-bool ClearField()
+bool ClearField(PaintField& field)
 {
 	for (short i = 0; i < COORD_MAX; i++)
 	{
@@ -40,7 +50,7 @@ bool ClearField()
 	return 1;
 }
 
-bool CopyFieldFromIS(std::istream& is)
+bool CopyFieldFromIS(std::istream& is, PaintField& field)
 {
 	std::string lineContent;
 	int row = 0;
@@ -61,38 +71,59 @@ bool CopyFieldFromIS(std::istream& is)
 	return 1;
 }
 
-struct Point
-{
-	short x = -1;
-	short y = -1;
-};
-
-bool OnField(Point& p)
+bool OnField(const Point& p)
 {
 	return (p.x >= COORD_MIN && p.x < COORD_MAX
 		&& p.y >= COORD_MIN && p.y < COORD_MAX);
 }
 
-bool fill(Point p)
+bool Draw(const Point& p, PaintField& field)
 {
-	if (!(p.x >= COORD_MIN && p.x < COORD_MAX
-		&& p.y >= COORD_MIN && p.y < COORD_MAX))
-	{
-		return 0;
-	}
-	if (field[p.y][p.x] == '#' || field[p.y][p.x] == '-')
-	{
-		return 0;
-	}
-	if (field[p.y][p.x] == ' ')
+	if (field[p.y][p.x] != 'O')
 	{
 		field[p.y][p.x] = '-';
 	}
-	fill({ p.x + 1, p.y });
-	fill({ p.x, p.y + 1 });
-	fill({ p.x - 1, p.y });
-	fill({ p.x, p.y - 1 });
+	return 1;
+}
 
+std::array<Point, 4> GetNewCoords(const Point& p)
+{
+	Point up = { p.x, p.y - 1 },
+		  down = { p.x, p.y + 1 },
+		  left = { p.x - 1, p.y },
+		  right = { p.x + 1, p.y };
+	return {
+		up,
+		down,
+		left,
+		right
+	};
+}
+
+bool GetNextStack(Stack& s, PaintField field)
+{
+	Point p;
+	p = s.top();
+	s.pop();
+	std::array<Point, 4> route = GetNewCoords(p);
+	for (Point nextP : route)
+	{
+		if (OnField(nextP) && field[nextP.y][nextP.x] == ' ')
+		{
+			s.push(nextP);
+		}
+	}
+	return 1;
+}
+
+bool fillArea(Point p, Stack& s, PaintField& field)
+{
+	s.push(p);
+	while (!s.empty())
+	{
+		Draw(s.top(), field);
+		GetNextStack(s, field);
+	}
 	return 1;
 }
 
@@ -136,10 +167,9 @@ int main(int argc, char* argv[])
 	}
 
 	// заполнение поля пробелами
-	ClearField();
-
+	ClearField(field);
 	// Копирование данных из файла
-	CopyFieldFromIS(input);
+	CopyFieldFromIS(input, field);
 
 	// Заполнение поля
 	for (short i = 0; i < COORD_MAX; i++)
@@ -148,7 +178,7 @@ int main(int argc, char* argv[])
 		{
 			if (field[i][j] == 'O')
 			{
-				fill({ j, i });
+				fillArea({ j, i }, stack, field);
 			}
 		}
 	}

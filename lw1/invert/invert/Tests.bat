@@ -6,8 +6,8 @@ fc "%TEMP%\out.txt" "out1.txt" > nul || goto err
 echo Test 1 passed
 
 REM Test 2 : Работа с числами типа float
-%MyProgram% "in1.txt" > "%TEMP%\out.txt" || goto err
-fc "%TEMP%\out.txt" "out1.txt" > nul || goto err
+%MyProgram% "in2.txt" > "%TEMP%\out.txt" || goto err
+fc "%TEMP%\out.txt" "out2.txt" > nul || goto err
 echo Test 2 passed
 
 REM Test 3 : Если один из коэ-тов записан не на своем месте

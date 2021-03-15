@@ -47,7 +47,7 @@ bool PrintMatrix(Matrix3x3& matrix)
 	{
 		for (int j = 0; j < SIZE_3; j++)
 		{
-			std::cout << std::setprecision(3) << matrix[i][j] << "\t";
+			std::cout << std::fixed << std::setprecision(3) << matrix[i][j] << "\t";
 		}
 		std::cout << std::endl;
 	}

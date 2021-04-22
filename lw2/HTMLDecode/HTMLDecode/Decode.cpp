@@ -39,7 +39,7 @@ std::string HtmlDecode(std::string const& html)
 	for (std::sregex_iterator i = wordsBegin; i != wordsEnd; ++i)
 	{
 		std::smatch match = *i;
-		result += (std::string)match.prefix() + decode[match[0]];
+		result.append(match.prefix().str()).append(decode[match[0]]);
 		lastmatch = match;
 	}
 	result += lastmatch.suffix();

@@ -24,7 +24,6 @@ SCENARIO("String may contain tags")
 	REQUIRE(HtmlDecode(str) == "Cat <says> \"Meow\". M&M's");
 }
 
-// Cat &lt;says&gt; &quot;Meow&quot;. M&amp;M&apos;s
 
 SCENARIO("The string can contain the beginning of the tag")
 {
@@ -32,3 +31,8 @@ SCENARIO("The string can contain the beginning of the tag")
 	REQUIRE(HtmlDecode(str) == "&");
 }
 
+SCENARIO("The string can contain the beginning of the tag and tag")
+{
+	std::string str = "&&amp;";
+	REQUIRE(HtmlDecode(str) == "&&");
+}

@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="in.txt">
+      <Filter>Исходные файлы</Filter>
+    </Text>
+    <Text Include="out.txt">
+      <Filter>Исходные файлы</Filter>
+    </Text>
     <Text Include="temp.txt">
-      <Filter>Исходные файлы</Filter>
-    </Text>
-    <Text Include="in1.txt">
-      <Filter>Исходные файлы</Filter>
-    </Text>
-    <Text Include="out1.txt">
       <Filter>Исходные файлы</Filter>
     </Text>
   </ItemGroup>
@@ -29,10 +29,5 @@
     <ClCompile Include="fill.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="tests.bat">
-      <Filter>Исходные файлы</Filter>
-    </None>
   </ItemGroup>
 </Project>

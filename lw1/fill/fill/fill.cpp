@@ -58,13 +58,6 @@ bool CopyFieldFromIS(std::istream& is, PaintField& field)
 	{
 		for (int column = 0; column < COORD_MAX && column < lineContent.length(); column++)
 		{
-			if (lineContent[column] != 'O'
-				&& lineContent[column] != ' '
-				&& lineContent[column] != '#')
-			{
-				throw (std::string)"Find invalid char\n";
-				return 0;
-			}
 			field[row][column] = lineContent[column];
 		}
 		row++;
@@ -72,7 +65,7 @@ bool CopyFieldFromIS(std::istream& is, PaintField& field)
 
 	if (is.bad())
 	{
-		throw (std::string)"Failed to read data from input stream\n";
+		std::cout << "Failed to read data from input stream" << std::endl;
 		return 0;
 	}
 	return 1;
@@ -86,7 +79,7 @@ bool OnField(const Point& p)
 
 bool Draw(const Point& p, PaintField& field)
 {
-	if (field[p.y][p.x] == ' ')
+	if (field[p.y][p.x] != 'O')
 	{
 		field[p.y][p.x] = '-';
 	}
@@ -107,7 +100,7 @@ std::array<Point, 4> GetNewCoords(const Point& p)
 	};
 }
 
-bool GetNextStack(Stack& s, PaintField& field)
+bool GetNextStack(Stack& s, PaintField field)
 {
 	Point p;
 	p = s.top();
@@ -115,7 +108,7 @@ bool GetNextStack(Stack& s, PaintField& field)
 	std::array<Point, 4> route = GetNewCoords(p);
 	for (Point nextP : route)
 	{
-		if (OnField(nextP))
+		if (OnField(nextP) && field[nextP.y][nextP.x] == ' ')
 		{
 			s.push(nextP);
 		}
@@ -142,36 +135,13 @@ bool WriteField(std::ostream& os)
 		{
 			if (!os.put(field[i][j]))
 			{
-				throw (std::string)"Failed to write data to output stream\n";
+				std::cout << "Failed to write data to output stream";
 				return 0;
 			}
 		}
 		os << std::endl;
 	}
 	return 1;
-}
-
-bool FillAllArea(std::istream& input, PaintField& field)
-{
-	try
-	{
-		ClearField(field);
-		CopyFieldFromIS(input, field);
-		for (short i = 0; i < COORD_MAX; i++)
-		{
-			for (short j = 0; j < COORD_MAX; j++)
-			{
-				if (field[i][j] == 'O')
-				{
-					fillArea({ j, i }, stack, field);
-				}
-			}
-		}
-	}
-	catch (const std::string& /*ex*/)
-	{
-		throw;
-	}
 }
 
 int main(int argc, char* argv[])
@@ -188,21 +158,30 @@ int main(int argc, char* argv[])
 		std::cout << "Failed to open file for reading\n";
 		return 1;
 	}
+
 	std::ofstream output(args->outputFileName);
 	if (!output.is_open())
 	{
 		std::cout << "Failed to open file for writing\n";
 		return 1;
 	}
-	try
+
+	// заполнение поля пробелами
+	ClearField(field);
+	// Копирование данных из файла
+	CopyFieldFromIS(input, field);
+
+	// Заполнение поля
+	for (short i = 0; i < COORD_MAX; i++)
 	{
-		FillAllArea(input, field);
-		WriteField(output);
+		for (short j = 0; j < COORD_MAX; j++)
+		{
+			if (field[i][j] == 'O')
+			{
+				fillArea({ j, i }, stack, field);
+			}
+		}
 	}
-	catch (const std::string& ex)
-	{
-		std::cout << ex;
-		return 1;
-	}
+	WriteField(output);
 	return 0;
 }

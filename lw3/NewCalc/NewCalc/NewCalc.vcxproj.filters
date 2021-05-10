@@ -18,10 +18,10 @@
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Variables.cpp">
+    <ClCompile Include="Fn.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Fn.cpp">
+    <ClCompile Include="Variables.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Calc.cpp">
@@ -29,13 +29,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Calc.h">
+    <ClInclude Include="Fn.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Variables.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="Fn.h">
+    <ClInclude Include="Calc.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

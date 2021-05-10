@@ -31,4 +31,3 @@ private:
 	std::ostream& m_os;
 	static std::map<std::string, CalcAction> const ParseAction;
 };
-

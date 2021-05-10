@@ -1,15 +1,18 @@
 #include <iostream>
-#include <string>
 #include <locale>
-#include "Calc.h"
+#include <map>
 #include "windows.h"
+#include "Calc.h"
+
 
 int main()
 {
 	setlocale(LC_ALL, "");
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
+	
+	Calc calc;
+	calc.StartCalculating();
 
-	Calc calculator;
-	calculator.StartCalculating();
+	return 0;
 }

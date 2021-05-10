@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{145604f3-a815-4c0c-8745-a82475922250}</ProjectGuid>
-    <RootNamespace>Calc</RootNamespace>
+    <ProjectGuid>{57a29ca0-b7e5-4d75-9616-80f48c64ffaa}</ProjectGuid>
+    <RootNamespace>Calctests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -143,15 +143,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Calc.cpp" />
-    <ClCompile Include="Fn.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Variables.cpp" />
+    <ClInclude Include="..\Calc\Calc.h" />
+    <ClInclude Include="..\Calc\Fn.h" />
+    <ClInclude Include="..\Calc\Variables.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Calc.h" />
-    <ClInclude Include="Fn.h" />
-    <ClInclude Include="Variables.h" />
+    <ClCompile Include="..\Calc\Calc.cpp" />
+    <ClCompile Include="..\Calc\Fn.cpp" />
+    <ClCompile Include="..\Calc\Variables.cpp" />
+    <ClCompile Include="Calc_tests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

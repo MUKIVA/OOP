@@ -1,0 +1,7 @@
+Shape name: Circle
+	Center: X:-30,000000 Y:-250,000000
+	Radius: 10,000000
+	Perimeter: 62,831853
+	Area: 314,159265
+	Fill color: 000000
+	Outline color: 000000

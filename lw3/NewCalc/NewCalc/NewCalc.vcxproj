@@ -146,11 +146,13 @@
     <ClCompile Include="Calc.cpp" />
     <ClCompile Include="Fn.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="newVariables.cpp" />
     <ClCompile Include="Variables.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Calc.h" />
     <ClInclude Include="Fn.h" />
+    <ClInclude Include="newVariables.h" />
     <ClInclude Include="Variables.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -15,7 +15,7 @@ SCENARIO("Constructors tests")
 			REQUIRE(url.GetDomain() == "google.com");
 			REQUIRE(url.GetPort() == 80);
 			REQUIRE(url.GetProtocol() == Protocol::HTTP);
-			REQUIRE(url.GetURL() == "http://google.com:80/index.php");
+			REQUIRE(url.GetURL() == "http://google.com/index.php");
 		}
 
 		THEN("[Protocol]://[domain]:[port]/[document]")
@@ -43,6 +43,11 @@ SCENARIO("Constructors tests")
 			REQUIRE_THROWS(CHttpUrl("htttp://google.com:90"));
 		}
 
+		THEN("[Protocol]://[domain]:[port_invalid]")
+		{
+			REQUIRE_THROWS(CHttpUrl("https://google.com:!23"));
+		}
+
 		THEN("[Protocol]://[domain_invalid]:[port]")
 		{
 			REQUIRE_THROWS(CHttpUrl("http://:90"));
@@ -68,7 +73,7 @@ SCENARIO("Constructors tests")
 			REQUIRE(url.GetDomain() == "google.com");
 			REQUIRE(url.GetPort() == 80);
 			REQUIRE(url.GetProtocol() == Protocol::HTTP);
-			REQUIRE(url.GetURL() == "http://google.com:80/index.php");
+			REQUIRE(url.GetURL() == "http://google.com/index.php");
 		}
 
 		THEN("[Protocol][domain_invalid][document]")
@@ -83,7 +88,7 @@ SCENARIO("Constructors tests")
 			REQUIRE(url.GetDomain() == "google.com");
 			REQUIRE(url.GetPort() == 80);
 			REQUIRE(url.GetProtocol() == Protocol::HTTP);
-			REQUIRE(url.GetURL() == "http://google.com:80");
+			REQUIRE(url.GetURL() == "http://google.com");
 		}
 	}
 
@@ -119,4 +124,39 @@ SCENARIO("Constructors tests")
 			REQUIRE_THROWS(CHttpUrl("google.com", "index.php", Protocol::HTTP, 0));
 		}
 	}
+}
+
+SCENARIO("port out of range")
+{
+	WHEN("port 65535")
+	{
+		CHttpUrl url("http://google.com:65535");
+		REQUIRE(url.GetDocument() == "");
+		REQUIRE(url.GetDomain() == "google.com");
+		REQUIRE(url.GetPort() == 65535);
+		REQUIRE(url.GetProtocol() == Protocol::HTTP);
+		REQUIRE(url.GetURL() == "http://google.com:65535");
+	}
+
+	WHEN("port 65536")
+	{
+		REQUIRE_THROWS(CHttpUrl("http://google.com:65537"));
+	}
+
+	WHEN("port 0")
+	{
+		REQUIRE_THROWS(CHttpUrl("google.com", "index.php", Protocol::HTTP, 0));
+		REQUIRE_THROWS(CHttpUrl("http://google.com:0"));
+	}
+}
+
+SCENARIO("protocol tolower")
+{
+
+	CHttpUrl url("HTTP://google.com/index.php");
+	REQUIRE(url.GetDocument() == "/index.php");
+	REQUIRE(url.GetDomain() == "google.com");
+	REQUIRE(url.GetPort() == 80);
+	REQUIRE(url.GetProtocol() == Protocol::HTTP);
+	REQUIRE(url.GetURL() == "http://google.com/index.php");
 }

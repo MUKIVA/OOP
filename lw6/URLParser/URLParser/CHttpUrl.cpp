@@ -5,40 +5,82 @@
 #include <algorithm>
 
 
-const unsigned short PROTOCOL_INDEX = 1;
-const unsigned short HOST_INDEX = 3;
-const unsigned short PORT_INDEX = 5;
-const unsigned short START_DOCUMENT_INDEX = 6;
-const unsigned short DOCUMENT_INDEX = 7;
 
 const std::map<std::string, Protocol> stringToProtocolMap{
 	{ "http", Protocol::HTTP },
 	{ "https", Protocol::HTTPS }
 };
 
+const std::map<Protocol, unsigned short> defaultPortValueForProtocol{
+	{ Protocol::HTTP, 80 },
+	{ Protocol::HTTPS, 443 }
+};
+
+bool IsValidProtocol(std::string const& protocol) 
+{
+	return (stringToProtocolMap.find(protocol) != stringToProtocolMap.end());
+}
+
+bool IsValidDomain(std::string const& domain) 
+{
+	return !(domain.empty());
+}
+
+bool IsValidPort(const unsigned int port) 
+{
+	return port > 0 && port <= 65535;
+}
+
+std::string ConvertToDocument(std::string& document)
+{
+	if (document.empty())
+	{
+		return document;
+	}
+
+	if (document[0] != '/')
+	{
+		return "/" + document;
+	}
+	return document;
+}
+
+unsigned short ConvertToPort(std::string& port) 
+{
+	unsigned int result = stoi(port);
+	if (!IsValidPort(result))
+		throw CUrlParsingError("invalid port");
+	return result;
+}
+
 CHttpUrl::CHttpUrl(std::string const& url)
 {
 	std::regex urlReg("(.+)"
 					  "(://)"
 					  "([^/^:]+)"
-					  "(:)?"
-					  "(\\d+)?"
-					  "(/)?"
-					  "(.*)?");
+					  "((:)(\\d+))?"
+					  "((/)(.*))?");
+
+	const unsigned short PROTOCOL_INDEX = 1;
+	const unsigned short HOST_INDEX = 3;
+	const unsigned short PORT_INDEX = 6;
+	const unsigned short START_DOCUMENT_INDEX = 7;
+	const unsigned short DOCUMENT_INDEX = 9;
 	std::smatch urlMatch;
 	if (regex_match(url, urlMatch, urlReg))
 	{
 		std::string protocol = urlMatch[PROTOCOL_INDEX].str();
+		std::transform(protocol.begin(), protocol.end(), protocol.begin(), tolower);
 		std::string domain = urlMatch[HOST_INDEX].str();
 		std::string port = urlMatch[PORT_INDEX].matched ? urlMatch[PORT_INDEX].str() : "";
 		std::string document = urlMatch[DOCUMENT_INDEX].str();
 
-		if (!isValidProtocol(protocol))
+		if (!IsValidProtocol(protocol))
 		{
 			throw CUrlParsingError("invalid protocol");
 		}
 
-		if (!isValidDomain(domain))
+		if (!IsValidDomain(domain))
 		{
 			throw CUrlParsingError("invalid domain");
 		}
@@ -47,7 +89,7 @@ CHttpUrl::CHttpUrl(std::string const& url)
 		m_domain = domain;
 		m_port = !port.empty()
 			? ConvertToPort(port)
-			: m_defaultPortValueForProtocol.at(m_protocol);
+			: defaultPortValueForProtocol.at(m_protocol);
 		m_document = ConvertToDocument(document);
 		return;
 	}
@@ -60,11 +102,11 @@ CHttpUrl::CHttpUrl(std::string const& domain, std::string const& document, Proto
 	, m_port(port)
 	, m_document(document)
 {
-	if (!isValidDomain(domain))
+	if (!IsValidDomain(domain))
 	{
 		throw CUrlParsingError("invalid domain");
 	}
-	if (!isValidPort(port))
+	if (!IsValidPort(port))
 	{
 		throw CUrlParsingError("invalid port");
 	}
@@ -76,18 +118,26 @@ CHttpUrl::CHttpUrl(std::string const& domain, std::string const& document, Proto
 	, m_domain(domain)
 	, m_document(document)
 {
-	if (!isValidDomain(domain))
+	if (!IsValidDomain(domain))
 	{
 		throw std::invalid_argument("invalid domain");
 	}
 	m_document = ConvertToDocument(m_document);
-	m_port = m_defaultPortValueForProtocol.at(m_protocol);
+	m_port = defaultPortValueForProtocol.at(m_protocol);
 }
 
 std::string CHttpUrl::GetURL() const
 {
-	
-	return GetProtocolString(m_protocol).append("://").append(m_domain).append(":").append(std::to_string(m_port)).append(m_document);
+	std::string url = GetProtocolString(m_protocol).append("://").append(m_domain);
+	if (m_port == defaultPortValueForProtocol.at(m_protocol))
+	{
+		return url.append(m_document);
+	}
+	else
+	{
+		return url.append(std::to_string(m_port)).append(m_document);
+	}
+	return url;
 }
 
 std::string CHttpUrl::GetDocument() const
@@ -110,21 +160,6 @@ Protocol CHttpUrl::GetProtocol() const
 	return m_protocol;
 }
 
-bool CHttpUrl::isValidProtocol(std::string const& protocol) const
-{
-	return (stringToProtocolMap.find(protocol) != stringToProtocolMap.end());
-}
-
-bool CHttpUrl::isValidDomain(std::string const& domain) const
-{
-	return !(domain.empty());
-}
-
-bool CHttpUrl::isValidPort(const unsigned short port) const
-{
-	return port > 0;
-}
-
 std::string CHttpUrl::GetProtocolString(Protocol protocol) const
 {
 	std::string result;
@@ -136,24 +171,3 @@ std::string CHttpUrl::GetProtocolString(Protocol protocol) const
 	return result;
 }
 
-std::string CHttpUrl::ConvertToDocument(std::string& document) const
-{
-	if (document.empty())
-	{
-		return document;
-	}
-
-	if (document[0] != '/')
-	{
-		return "/" + document;
-	}
-	return document;
-}
-
-unsigned short CHttpUrl::ConvertToPort(std::string& port) const
-{
-	unsigned short result = stoi(port);
-	if (!isValidPort(result))
-		throw CUrlParsingError("invalid port");
-	return result;
-}

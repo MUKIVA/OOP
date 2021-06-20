@@ -3,6 +3,14 @@
 #include <cassert>
 #include <map>
 
+//Стандартный порт выводиться не должен +
+// Сделать тест на https://google.com:!23 +
+// Нужно смотреть переполнение порта +
+// Приводить протокол к нижнему регистру +
+// Исправить регистр символов в названиях методов +
+// Методы класса, которые не используют поля класса, сделять статическими либо сделать свободными функциями +
+
+
 enum class Protocol
 {
 	HTTP,
@@ -25,16 +33,6 @@ public:
 
 
 private:
-	const std::map<Protocol, unsigned short> m_defaultPortValueForProtocol{
-		{ Protocol::HTTP, 80 },
-		{ Protocol::HTTPS, 443 }
-	};
-
-	bool isValidProtocol(std::string const& protocol) const;
-	bool isValidDomain(std::string const& domain) const;
-	bool isValidPort(const unsigned short port) const;
-	std::string ConvertToDocument(std::string& document) const;
-	unsigned short ConvertToPort(std::string& port) const;
 	Protocol m_protocol;
 	std::string m_domain;
 	unsigned short m_port;

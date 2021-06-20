@@ -68,7 +68,7 @@ class CMyArray
         }
 		friend bool operator!=(MyType const& left, MyType const& right)
 		{
-			return *left != *right;
+			return left.m_item != right.m_item;
 		}
 	public:
         IteratorBase(T* item)
@@ -76,14 +76,14 @@ class CMyArray
         {
         }
 
-    protected:
+    public:
         T* m_item = nullptr;
 
     };
 
 public:
     CMyArray() = default;
-    CMyArray(const CMyArray& arr)
+	CMyArray(CMyArray const& arr)
 	{
 		const auto size = arr.GetSize();
 		if (size != 0)
@@ -103,12 +103,9 @@ public:
 	}
 	CMyArray(CMyArray&& other) noexcept
 	{
-		this->m_begin = other.m_begin;
-		this->m_end = other.m_end;
-		this->m_endOfCapacity = other.m_endOfCapacity;
-		other.m_begin = nullptr;
-		other.m_end = nullptr;
-		other.m_endOfCapacity = nullptr;
+		std::swap(this->m_begin, other.m_begin);
+		std::swap(this->m_end, other.m_end);
+		std::swap(this->m_endOfCapacity, other.m_endOfCapacity);
 	}
 
     void Append(const T& value)
@@ -180,7 +177,10 @@ public:
 
     T& GetBack()
 	{
-		assert(GetSize() != 0);
+		if (GetSize() == 0)
+		{
+			throw std::out_of_range("Called with empty array");
+		}
 		return m_end[-1];
 	}
     const T& GetBack() const
@@ -240,6 +240,34 @@ public:
 		return std::reverse_iterator<iterator>(begin());
 	}
 
+
+	CMyArray<T> operator=(CMyArray<T> const& right)
+	{
+		Clear();
+		const auto size = right.GetSize();
+		if (size != 0)
+		{
+			m_begin = RawAlloc(size);
+			try
+			{
+				CopyItems(right.m_begin, right.m_end, m_begin, m_end);
+				m_endOfCapacity = m_end;
+			}
+			catch (...)
+			{
+				DeleteItems(m_begin, m_end);
+				throw;
+			}
+		}
+		return *this;
+	}
+	CMyArray operator=(CMyArray&& right) noexcept
+	{
+		std::swap(m_begin, right.m_begin);
+		std::swap(m_end, right.m_end);
+		std::swap(m_endOfCapacity, right.m_endOfCapacity);
+		return *this;
+	}
 
 	T& operator[](size_t n)
 	{

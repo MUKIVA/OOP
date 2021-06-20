@@ -3,36 +3,32 @@
 #include <string>
 #include <vector>
 
+CMyArray<int> GetArray()
+{
+	CMyArray<int> result;
+	result.Append(3);
+	result.Append(4);
+	result.Append(5);
+	result.Append(6);
+	return result;
+}
+
 int main()
 {
 	CMyArray<int> arr;
 	CMyArray<int> arr2;
-	// добавление элементов в конец массива
-	arr.Append(10);
-	arr.Append(20);
-	arr.Append(30);
-	//arr = arr2;
-	// ѕолучение количества элементов
-	size_t size = arr.GetSize();
-	// получение элемента при помощи []
-		// копирование
-	int el2 = arr[2];
-		// редактирование
-	arr[2] = 40;
-	int el2_40 = arr[2];
-	//Resize
-	arr.Resize(10);
-	size = arr.GetSize();
-	arr[2];
-	arr[4];
-	// Clear
-	arr.Clear();
-	size = arr.GetSize();
-	std::vector<int> v;
-	v.push_back(10);
-	v.push_back(20);
-	v.push_back(30);
-	v.clear();
-
+	arr2.Append(1);
+	arr2.Append(2);
+	arr2.Append(3);
+	int size1 = arr.GetSize();
+	int size2 = arr2.GetSize();
+	arr = arr2;
+	size1 = arr.GetSize();
+	size2 = arr2.GetSize();
+	std::vector<int> s;
+	s.back();
+	arr = GetArray();
+	size1 = arr.GetSize();
+//	int back = arr.GetBack();
     return 0;
 }
